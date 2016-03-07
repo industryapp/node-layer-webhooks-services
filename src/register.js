@@ -29,6 +29,8 @@
  * @param {String[]} hooks.events - Any combination of 'message.sent', 'message.deleted', 'message.read', 'message.delivered', 'conversation.created', 'conversation.deleted', 'conversation.metadata_updated', 'conversation.participants_updated'
  * @param {String} hooks.path - Path extension to your url for listening to these webhooks
  */
+var Debug = require('debug');
+var logger = Debug('layer-webhooks-services');
 module.exports = function(webhooksClient, options) {
   var hooks = options.hooks;
   var url = options.url.replace(/\:443$/,'');
@@ -52,15 +54,15 @@ module.exports = function(webhooksClient, options) {
    * @param {Object} webhook -- A webhook object from Layer
    */
   function verifyWebhook(hookDef, webhook) {
-    console.log(hookDef.name + ': webhook already registered: ' + webhook.id + ': ' + webhook.status);
+    logger(hookDef.name + ': Webhook already registered: ' + webhook.id + ': ' + webhook.status);
     if (webhook.status !== 'active') {
-      console.log(hookDef.name + ': Enabling webhook');
+      logger(hookDef.name + ': Enabling webhook');
       webhooksClient.enable(webhook.id);
     }
   }
 
   function registerWebhook(hookDef) {
-    console.log(hookDef.name + ': Registering Webhook');
+    logger(hookDef.name + ': Registering Webhook');
     webhooksClient.register({
       url: url + hookDef.path,
       events: hookDef.events,

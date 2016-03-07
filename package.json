@@ -8,10 +8,11 @@
     "url": "git@github.com:layerhq/node-layer-webhooks-services.git"
   },
   "dependencies": {
+    "body-parser": "^1.14.2",
+    "debug": "^2.2.0",
     "kue": "^0.10.5",
     "layer-webhooks": "^1.0.0",
-    "ms": "^0.7.1",
-    "body-parser": "^1.14.2"
+    "ms": "^0.7.1"
   },
   "devDependencies": {
     "mocha": "^2.4.5",

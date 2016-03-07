@@ -51,6 +51,7 @@ var crypto = require('crypto');
 var kue = require('kue');
 var queue = kue.createQueue();
 var jsonParser = require('body-parser').json({type: 'application/vnd.layer.webhooks+json'});
+var Debug = require('debug');
 
 module.exports = function(options) {
   var app = options.expressApp;
@@ -63,6 +64,7 @@ module.exports = function(options) {
    */
   hooks.forEach(function(hookDef) {
     var webhookName = hookDef.name;
+    var logger = Debug('layer-webhooks-services:' + webhookName.replace(/\s/g,'-'));
     var path = hookDef.path;
     if (path.indexOf('/') !== 0) path = '/' + path;
     var delay = hookDef.delay ? ms(hookDef.delay) : 0;
@@ -72,7 +74,7 @@ module.exports = function(options) {
      * first registering a webhook... or when activating a disabled webhook.
      */
     app.get(path, function(req, res) {
-      console.log(new Date().toLocaleString() + ': ' + webhookName + ': Received Verification Challenge');
+      logger('Received Verification Challenge');
       if (req.query.verification_challenge) {
         return res.send(req.query.verification_challenge);
       }
@@ -84,7 +86,7 @@ module.exports = function(options) {
      * accumulated events.
      */
     app.post(path, jsonParser, handleValidation, function(req, res) {
-      console.log(new Date().toLocaleString() + ': ' + webhookName + ': Received webhook for ' + req.body.event.type);
+      logger('Received webhook for ' + req.body.event.type);
 
       // We are receiving events for a different webhook; common occurance during development after tweaking
       // a webhook name.  After tweaking a name you will now have two webhooks; returning an error here
@@ -129,9 +131,7 @@ module.exports = function(options) {
 
       if (hash === signature) next();
       else {
-        console.error(new Date().toLocaleString() + ': ' + webhookName + ': ' +
-          'Computed HMAC Signature ' + hash + ' did not match signed header ' + signature + '. ' +
-          'Returning Error!');
+        logger('Computed HMAC Signature ' + hash + ' did not match signed header ' + signature + '. Returning Error!');
         res.sendStatus(403);
       }
     }

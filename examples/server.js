@@ -140,13 +140,14 @@ try {
     rejectUnauthorized: false
   }, app);
 } catch(e) {
+  console.log('SSL folder not found; assume heroku environment');
   secureServer = app;
 }
 // Startup the server; allow for a custom heroku PORT
 secureServer.listen(process.env.PORT || PORT, function() {
   console.log('Secure Express server listening on port ' + PORT);
   var tasks = process.env.WEBHOOK_SERVER_TASKS ?
-    process.env.WEBHOOK_SERVER_TASKS.split(/\s*,\s*/) : ['inline', 'basic', 'receipts'];
+    process.env.WEBHOOK_SERVER_TASKS.split(/\s*,\s*/) : ['inline', 'basic', 'receipt'];
   if (tasks.indexOf('inline') !== -1) startInlineServices();
   if (tasks.indexOf('basic') !== -1)  startBasicServices();
   if (tasks.indexOf('receipt') !== -1)  startReceiptServices();

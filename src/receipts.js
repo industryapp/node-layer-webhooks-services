@@ -56,6 +56,7 @@
 var ms = require('ms');
 var listen = require('./listen');
 var queue = require('kue').createQueue();
+var Debug = require('debug');
 var REDIS_PREFIX = 'layer-webhooks-';
 
 module.exports = function(redis, options) {
@@ -118,8 +119,9 @@ module.exports = function(redis, options) {
      * process the message.
      */
     queue.process(hook.name + ' delayed-job', function(job, done) {
+      var logger = Debug('layer-webhooks-services:' + hook.name.replace(/\s/g,'-'));
       var messageId = job.data.messageId;
-      console.log(new Date().toLocaleString() + ': ' + hook.name + ': Processing ' + messageId);
+      logger('Processing ' + messageId);
       redis.get(REDIS_PREFIX + messageId, function (err, reply) {
         try {
           if (reply) {
