@@ -156,7 +156,12 @@ var webhook = {
 
     // Any user whose recipient status is 'sent' or 'delivered' (not 'read')
     // is of interest once the delay has completed.
-    recipient_status_filter: ['sent', 'delivered']
+    reportForStatus: ['sent', 'delivered'],
+
+    // True, false, or a function if you need Identity data for the senders and recipients included
+    // in each callback.  A value of true will generate additional traffic and may have costs
+    // to yours service.
+    identities: false
   }
 };
 
@@ -236,7 +241,24 @@ Custom Hook Parameters:
 
   * `receipts`: Parameters specific to the receipts operation:
     * `delay`: If its a number, then its the number of milliseconds to wait before creating the job for you to process.  If its a string, then see [this utility](https://www.npmjs.com/package/ms) for how this is processed.
-    * `recipient_status_filter`: Array of strings; this call should report on all recipients whose state matches any of the states you list. Possible values are 'sent', 'delivered', 'read'.  ['sent'] will report on all recipients who are still in 'sent' state for triggering 'undelivered' processing.  ['sent', 'delivered'] will report on all users who are either 'sent' OR 'delivered' meaning anyone who hasn't read the Message.
+    * `reportForStatus`: Array of strings; this call should report on all recipients whose state matches any of the states you list. Possible values are 'sent', 'delivered', 'read'.  ['sent'] will report on all recipients who are still in 'sent' state for triggering 'undelivered' processing.  ['sent', 'delivered'] will report on all users who are either 'sent' OR 'delivered' meaning anyone who hasn't read the Message.
+    * `identities`: If false, no identity data is loaded.  If true, then any identity data registered with Layer's Identity Servers are returned (this generates additional network requests and may have impact on your service).  If a function is provided, then you can
+    provide your own means of providing Identity data.
+
+#### The `identities` callback
+
+Your `identities` function takes a userId and a callback:
+
+```javascript
+var hook = {
+  delay: '30 min',
+  identities: function(userId, callback) {
+    request(myUrl + userId, function(err, res, body) {
+      callback(err, body);
+    });
+  }
+}
+```
 
 ## Webhook Events
 

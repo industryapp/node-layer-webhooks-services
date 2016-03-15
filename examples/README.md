@@ -11,8 +11,9 @@ There are a number of examples in this folder. Take a look at the [basic service
 4. Deploy to Heroku: `git push heroku master`
 5. Configure your App ID: `heroku config:set LAYER_APP_ID=YOUR_APP_ID`
 6. Configure your Authentication Token: `heroku config:set LAYER_BEARER_TOKEN=YOUR_TOKEN`
-7. Configure your Hostname: `heroku config:set HOST=$(heroku apps:info -s  | grep web-url | cut -d= -f2)`
-8. Install `heroku-redis`: Instructions at https://devcenter.heroku.com/articles/heroku-redis#installing-the-cli-plugin
+7. Configure your Logger: `heroku config:set 'DEBUG=*,-body-parser:json, -express:*'`
+8. Configure your Hostname: `heroku config:set HOST=$(heroku apps:info -s  | grep web-url | cut -d= -f2)`
+9. Install `heroku-redis`: Instructions at https://devcenter.heroku.com/articles/heroku-redis#installing-the-cli-plugin
 
 You should now be able to send messages, change conversation titles, and see the webhook examples respond.
 

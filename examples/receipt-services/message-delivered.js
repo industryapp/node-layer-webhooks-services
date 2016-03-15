@@ -24,7 +24,7 @@ module.exports = function (layerClient) {
     events: ['message.sent', 'message.delivered', 'message.deleted'],
     delay: '10min',
     receipts: {
-      recipient_status_filter: ['sent']
+      reportForStatus: ['sent']
     }
   };
 
@@ -37,9 +37,10 @@ module.exports = function (layerClient) {
       var event = job.data;
       var message = event.message;
       var missedRecipients = event.recipients;
+      var identities = event.identities;
 
       missedRecipients.forEach(function(recipient) {
-        console.log(hook.name + ': Unable to deliver message ' + message.id + ' to ' + recipient);
+        console.log(hook.name + ': Unable to deliver message ' + message.id + ' to ' + recipient + '; Identities should be undefined: ', identities[recipient]);
       });
       done();
     } catch(e) {
