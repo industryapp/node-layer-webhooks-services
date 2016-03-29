@@ -76,7 +76,7 @@ module.exports = function(layerClient, redis, options) {
       receipts: {
         delay: ms(hook.delay),
         reportForStatus: hook.receipts.reportForStatus,
-	      identities: hook.receipts.identities
+        identities: hook.receipts.identities
       }
     };
   });
@@ -144,8 +144,8 @@ module.exports = function(layerClient, redis, options) {
 
     function getUserFromIdentities(userId, callback) {
       layerClient.identities.get(userId, function(err, response) {
-      	var identity = err ? null : response.body;
-      	callback(err, identity);
+        var identity = err ? null : response.body;
+        callback(err, identity);
       });
     }
 
@@ -159,24 +159,24 @@ module.exports = function(layerClient, redis, options) {
       });
 
       if (recipients.length) {
-      	var identities = [message.sender.user_id].concat(recipients);
-      	var identityHash = {};
-      	if (!hook.receipts.identities) {
-      	  createJob(message, recipients, {});
-      	} else {
-      	  if (!(hook.receipts.identities instanceof Function)) {
-      	    hook.receipts.identities = getUserFromIdentities;
-      	  }
-      	  var getUser = hook.receipts.identities;
-      	  var count = 0;
-      	  identities.forEach(function(userId) {
-      	    getUser(userId, function(err, data) {
-      	      identityHash[userId] = data;
-      	      count++;
-      	      if (count === identities.length) createJob(message, recipients, identityHash);
-      	    })
-      	  });
-      	}
+        var identities = [message.sender.user_id].concat(recipients);
+        var identityHash = {};
+        if (!hook.receipts.identities) {
+          createJob(message, recipients, {});
+        } else {
+          if (!(hook.receipts.identities instanceof Function)) {
+            hook.receipts.identities = getUserFromIdentities;
+          }
+          var getUser = hook.receipts.identities;
+          var count = 0;
+          identities.forEach(function(userId) {
+            getUser(userId, function(err, data) {
+              identityHash[userId] = data;
+              count++;
+              if (count === identities.length) createJob(message, recipients, identityHash);
+            })
+          });
+        }
       }
     }
 

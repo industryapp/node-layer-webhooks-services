@@ -24,9 +24,9 @@ module.exports = function (layerClient) {
     events: ['message.sent', 'message.delivered', 'message.deleted'],
     delay: '15sec',
     receipts: {
-      reportForStatus: ['sent']
-    },
-    identities: false
+      reportForStatus: ['sent'],
+      identities: false
+    }
   };
 
   /**
