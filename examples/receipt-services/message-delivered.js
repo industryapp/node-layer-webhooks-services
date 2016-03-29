@@ -22,10 +22,11 @@ module.exports = function (layerClient) {
     name: 'message-delivered demo',
     path: '/message-delivered',
     events: ['message.sent', 'message.delivered', 'message.deleted'],
-    delay: '10min',
+    delay: '15sec',
     receipts: {
       reportForStatus: ['sent']
-    }
+    },
+    identities: false
   };
 
   /**
@@ -40,7 +41,8 @@ module.exports = function (layerClient) {
       var identities = event.identities;
 
       missedRecipients.forEach(function(recipient) {
-        console.log(hook.name + ': Unable to deliver message ' + message.id + ' to ' + recipient + '; Identities should be undefined: ', identities[recipient]);
+        console.log(hook.name + ': Unable to deliver message ' + message.id + ' to ' + recipient)
+	console.log(hook.name + ': Identities should be undefined because identities: false was used in hook definition: ', identities[recipient]);
       });
       done();
     } catch(e) {

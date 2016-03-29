@@ -97,7 +97,7 @@ module.exports = function(layerClient, redis, options) {
         switch (event.type) {
           // Store the new message data and schedule a job to check the delivery status in 15 minutes
           case 'message.sent':
-              redis.set(REDIS_PREFIX + message.id, JSON.stringify(message));
+              redis.set(REDIS_PREFIX + hook.name + '-' +  message.id, JSON.stringify(message));
               queue.createJob(hook.name + ' delayed-job', {
                 title: 'Process undelivered message',
                 messageId: message.id
@@ -110,12 +110,12 @@ module.exports = function(layerClient, redis, options) {
           // Update the message data
           case 'message.delivered':
           case 'message.read':
-            redis.set(REDIS_PREFIX + message.id, JSON.stringify(message));
+            redis.set(REDIS_PREFIX + hook.name + '-' + message.id, JSON.stringify(message));
             break;
 
           // Delete the Message data; redis.get will fail for this item.
           case 'message.deleted':
-            redis.del(REDIS_PREFIX + message.id);
+            redis.del(REDIS_PREFIX + hook.name + '-' + message.id);
             break;
         }
       } finally {
@@ -130,11 +130,11 @@ module.exports = function(layerClient, redis, options) {
     queue.process(hook.name + ' delayed-job', function(job, done) {
       var messageId = job.data.messageId;
       logger('Processing ' + messageId);
-      redis.get(REDIS_PREFIX + messageId, function (err, reply) {
+      redis.get(REDIS_PREFIX + hook.name + '-' +  messageId, function (err, reply) {
         try {
           if (reply) {
             processMessage(JSON.parse(reply));
-            redis.del(REDIS_PREFIX + messageId);
+            redis.del(REDIS_PREFIX + hook.name + '-' + messageId);
           }
         } finally {
           done();
