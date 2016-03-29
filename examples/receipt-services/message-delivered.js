@@ -42,7 +42,7 @@ module.exports = function (layerClient) {
 
       missedRecipients.forEach(function(recipient) {
         console.log(hook.name + ': Unable to deliver message ' + message.id + ' to ' + recipient)
-	console.log(hook.name + ': Identities should be undefined because identities: false was used in hook definition: ', identities[recipient]);
+	      console.log(hook.name + ': Identities should be undefined because identities: false was used in hook definition: ', identities[recipient]);
       });
       done();
     } catch(e) {
