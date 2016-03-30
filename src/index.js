@@ -1,5 +1,6 @@
 
 var LayerWebhooks = require('layer-webhooks');
+var LayerClient = require('layer-api');
 
 /**
  * Layer Webhook Services constructor
@@ -11,8 +12,9 @@ var LayerWebhooks = require('layer-webhooks');
  */
 module.exports = function(config) {
     var webhooksClient = new LayerWebhooks(config);
+    var layerClient = new LayerClient(config);
 
     this.listen = require('./listen');
-    this.receipts = require('./receipts').bind(null, config.redis);
+    this.receipts = require('./receipts').bind(null, layerClient, config.redis);
     this.register = require('./register').bind(null, webhooksClient);
 };

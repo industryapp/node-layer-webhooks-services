@@ -18,9 +18,10 @@ module.exports = function (layerClient) {
     name: 'message-read demo',
     path: '/message-read',
     events: ['message.sent', 'message.read', 'message.deleted'],
-    delay: '30sec',
+    delay: '20sec',
     receipts: {
-      recipient_status_filter: ['sent', 'delivered']
+      reportForStatus: ['sent', 'delivered'],
+      identities: true
     }
   };
 
@@ -33,10 +34,12 @@ module.exports = function (layerClient) {
       var event = job.data;
       var message = event.message;
       var missedRecipients = event.recipients;
+      var identities = event.identities;
 
       missedRecipients.forEach(function(recipient) {
-        console.log(hook.name + ': ' + recipient + ' has not read ' + message.id);
+        console.log(hook.name + ': ' + recipient + ' has not read ' + message.id, '; Identities retrieved because identities: true was used in hook definition: \n', identities[recipient]);
       });
+
       done();
     } catch(e) {
       done(e);
