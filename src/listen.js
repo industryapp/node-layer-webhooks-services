@@ -127,12 +127,13 @@ module.exports = function(options) {
      */
     function handleValidation(req, res, next) {
       var payload = JSON.stringify(req.body);
-      var hash = crypto.createHmac('sha1', secret).update(payload).digest('hex');
+      var utf8safe = unescape(encodeURIComponent(payload));
+      var hash = crypto.createHmac('sha1', secret).update(utf8safe).digest('hex');
       var signature = req.get('layer-webhook-signature');
 
       if (hash === signature) next();
       else {
-        loggerError('Computed HMAC Signature ' + hash + ' did not match signed header ' + signature + '. Returning Error.  Config:', payload.config);
+        loggerError('Computed HMAC Signature ' + hash + ' did not match signed header ' + signature + '. Returning Error.  Config:', JSON.stringify(payload.config));
         res.sendStatus(403);
       }
     }
