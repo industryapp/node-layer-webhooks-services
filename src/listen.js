@@ -65,6 +65,7 @@ module.exports = function(options) {
   hooks.forEach(function(hookDef) {
     var webhookName = hookDef.name;
     var logger = Debug('layer-webhooks-services:' + webhookName.replace(/\s/g,'-'));
+    var loggerError = Debug('layer-webhooks-services-error:' + webhookName.replace(/\s/g,'-'));
     var path = hookDef.path;
     if (path.indexOf('/') !== 0) path = '/' + path;
     var delay = hookDef.delay ? ms(hookDef.delay) : 0;
@@ -131,7 +132,7 @@ module.exports = function(options) {
 
       if (hash === signature) next();
       else {
-        logger('Computed HMAC Signature ' + hash + ' did not match signed header ' + signature + '. Returning Error!');
+        loggerError('Computed HMAC Signature ' + hash + ' did not match signed header ' + signature + '. Returning Error.  Config:', payload.config);
         res.sendStatus(403);
       }
     }
