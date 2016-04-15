@@ -89,14 +89,6 @@ module.exports = function(options) {
     app.post(path, jsonParser, handleValidation, function(req, res) {
       logger('Received webhook for ' + req.body.event.type);
 
-      // We are receiving events for a different webhook; common occurance during development after tweaking
-      // a webhook name.  After tweaking a name you will now have two webhooks; returning an error here
-      // causes the older one to become inactive rather than sending us double the number of events.
-      if (req.body.config.name != webhookName && webhookName.indexOf(req.body.config.name + ':') !== 0) {
-      	console.error(new Date().toLocaleString() + ': ' + webhookName + ' received event meant for ' + req.body.config.name + '; returning error to server');
-      	return res.sendStatus(400);
-      }
-
       // Only respond to conversation events or to messages NOT sent via Platform API.
       // Responding to bots could create an infinite bot loop
       if (!req.body.message || req.body.message.sender.user_id) {
@@ -133,7 +125,7 @@ module.exports = function(options) {
 
       if (hash === signature) next();
       else {
-        loggerError('Computed HMAC Signature ' + hash + ' did not match signed header ' + signature + '. Returning Error.  Config:', JSON.stringify(payload.config));
+        loggerError('Computed HMAC Signature ' + hash + ' did not match signed header ' + signature + '. Returning Error.  Config:', JSON.stringify(payload.config || {}));
         res.sendStatus(403);
       }
     }

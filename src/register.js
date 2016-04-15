@@ -77,7 +77,7 @@ module.exports = function(webhooksClient, options) {
 
   function getWebhook(hookDef) {
     return currentHooks.filter(function (webhook) {
-      return webhook.config.name === hookDef.name && webhook.target_url === url + hookDef.path;
+      return webhook.config && webhook.config.name === hookDef.name && webhook.target_url === url + hookDef.path;
     })[0];
   }
 
