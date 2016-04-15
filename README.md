@@ -87,6 +87,7 @@ queue.process(webhook.name, function(job, done) {
   var webhookEvent = job.data;
   var message = webhookEvent.message;
   console.log('Message Received from: ' + message.sender.user_id);
+  done();
 });
 ```
 
@@ -131,6 +132,7 @@ queue.process(webhook.name, function(job, done) {
   var webhookEvent = job.data;
   var message = webhookEvent.message;
   console.log('Message Received from: ' + message.sender.user_id);
+  done();
 });
 ```
 
