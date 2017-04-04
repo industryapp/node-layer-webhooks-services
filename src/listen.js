@@ -120,7 +120,7 @@ module.exports = function(options) {
     function handleValidation(req, res, next) {
       var payload = JSON.stringify(req.body);
       var nodeVersion = Number(process.version.replace(/^v/, '').split(/\./)[0]);
-      console.log("NODE VERSION:" + nodeVersion);
+
       var utf8safe = nodeVersion >= 6 ? payload : unescape(encodeURIComponent(payload));
       var hash = crypto.createHmac('sha1', secret).update(utf8safe).digest('hex');
       var signature = req.get('layer-webhook-signature');
