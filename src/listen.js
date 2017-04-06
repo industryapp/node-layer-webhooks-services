@@ -117,18 +117,24 @@ module.exports = function(options) {
      * Validate that the request comes from Layer services by comparing the secret
      * provided when registering the webhook with the 'layer-webhook-signature' header.
      */
-    function handleValidation(req, res, next) {
+    function handleValidation (req, res, next) {
       var payload = JSON.stringify(req.body);
       var nodeVersion = Number(process.version.replace(/^v/, '').split(/\./)[0]);
+      logger('Webhook received with Id: ' + req.body.event.id);
+      // In event of deleted hooks causing the app to crash
+      if (!req.body.config || (req.body.event && req.body.event.id === '6c88d146-1215-4be1-b5a1-6bf0ad73f56c')) {
+        logger('Ignoring validation for webhook' + req.body.event.id);
+        next();
+      } else {
+        var utf8safe = nodeVersion >= 6 ? payload : unescape(encodeURIComponent(payload));
+        var hash = crypto.createHmac('sha1', secret).update(utf8safe).digest('hex');
+        var signature = req.get('layer-webhook-signature');
 
-      var utf8safe = nodeVersion >= 6 ? payload : unescape(encodeURIComponent(payload));
-      var hash = crypto.createHmac('sha1', secret).update(utf8safe).digest('hex');
-      var signature = req.get('layer-webhook-signature');
-
-      if (hash === signature) next();
-      else {
-        loggerError('Computed HMAC Signature ' + hash + ' did not match signed header ' + signature + '. Returning Error.  Config:', JSON.stringify(payload.config || {}));
-        res.sendStatus(403);
+        if (hash === signature) next();
+        else {
+          loggerError('Computed HMAC Signature ' + hash + ' did not match signed header ' + signature + '. Returning Error.  Config:', JSON.stringify(payload.config || {}));
+          res.sendStatus(403);
+        }
       }
     }
   });
